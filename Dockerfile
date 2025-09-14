@@ -1,40 +1,21 @@
-# Use OpenJDK 21 for Spring Boot (matches your pom.xml)
-FROM openjdk:21-jdk-slim
-
-# Set working directory
+# Stage 1: Build the application using Maven
+FROM maven:3.9.6-eclipse-temurin-21 AS build
 WORKDIR /app
-
-# Copy Maven wrapper and pom.xml
-COPY .mvn/ .mvn/
-COPY mvnw mvnw
-COPY pom.xml ./
-
-# Make mvnw executable
-RUN chmod +x mvnw
-
-# Download dependencies (this layer will be cached)
-RUN ./mvnw dependency:go-offline -B
-
-# Copy source code
-COPY src ./src
-
-# Build the application
+COPY . .
 RUN ./mvnw clean package -DskipTests
 
-# Create runtime image
-FROM openjdk:21-jre-slim
-
+# Stage 2: Run the application
+FROM eclipse-temurin:21-jre
 WORKDIR /app
+COPY --from=build /app/target/*.jar app.jar
 
-# Copy the built JAR from the build stage
-COPY --from=0 /app/target/*.jar app.jar
-
-# Expose port
+# Railway sets $PORT dynamically, so don’t hardcode 8080
+ENV PORT=8080
 EXPOSE 8080
 
-# Health check (using wget instead of curl, and checking health endpoint)
+# Health check (optional, use $PORT not fixed 8080)
 HEALTHCHECK --interval=30s --timeout=3s --start-period=60s --retries=3 \
-  CMD wget --no-verbose --tries=1 --spider http://localhost:8080/health || exit 1
+  CMD wget --no-verbose --tries=1 --spider http://localhost:$PORT/actuator/health || exit 1
 
-# Run the application
-ENTRYPOINT ["java", "-jar", "app.jar"]
+# Run with $PORT (important for Railway)
+CMD ["sh", "-c", "java -Dserver.port=$PORT -jar app.jar"]
