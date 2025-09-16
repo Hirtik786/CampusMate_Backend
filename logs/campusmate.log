@@ -1,0 +1,26 @@
+2025-09-16 09:02:46 [main] INFO  c.campusmate.CoursemateApplication - Starting CoursemateApplication v0.0.1-SNAPSHOT using Java 22.0.1 with PID 9552 (D:\kirtan\Coursemate\CampusMate\target\campusmate-0.0.1-SNAPSHOT.jar started by HP in D:\kirtan\Coursemate\CampusMate)
+2025-09-16 09:02:46 [main] DEBUG c.campusmate.CoursemateApplication - Running with Spring Boot v3.5.5, Spring v6.2.10
+2025-09-16 09:02:46 [main] INFO  c.campusmate.CoursemateApplication - The following 1 profile is active: "dev"
+2025-09-16 09:02:51 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-09-16 09:02:51 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 343 ms. Found 9 JPA repository interfaces.
+2025-09-16 09:02:55 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8080 (http)
+2025-09-16 09:02:55 [main] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2025-09-16 09:02:55 [main] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.44]
+2025-09-16 09:02:55 [main] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2025-09-16 09:02:55 [main] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 9449 ms
+2025-09-16 09:02:56 [main] INFO  o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-09-16 09:02:57 [main] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 6.6.26.Final
+2025-09-16 09:02:57 [main] INFO  o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+2025-09-16 09:02:59 [main] INFO  o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-09-16 09:02:59 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2025-09-16 09:03:00 [main] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@32513dea
+2025-09-16 09:03:00 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2025-09-16 09:03:01 [main] WARN  org.hibernate.orm.deprecation - HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2025-09-16 09:03:01 [main] INFO  o.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 17.6
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
