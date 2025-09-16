@@ -13,14 +13,14 @@ public class CorsConfig {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/**")
+                registry.addMapping("/**") // allow all endpoints
                         .allowedOrigins(
-                                "http://localhost:5173",              // local frontend (Vite)
+                                "http://localhost:8081",                 // local React dev
                                 "https://campusmatefrontend.netlify.app" // Netlify frontend
                         )
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedHeaders("*")
-                        .allowCredentials(true);
+                        .allowCredentials(true); // allow cookies/auth headers if needed
             }
         };
     }

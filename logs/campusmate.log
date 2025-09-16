@@ -43,3 +43,26 @@
         evt1_0.expiry<?
 2025-09-16 09:03:25 [scheduling-1] INFO  c.c.service.EmailVerificationService - Cleaned up expired verification tokens
 2025-09-16 10:15:36 [HikariPool-1:housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=1h4m28s310ms939µs900ns).
+2025-09-16 18:01:04 [restartedMain] INFO  c.campusmate.CoursemateApplication - Starting CoursemateApplication using Java 22.0.1 with PID 7900 (D:\kirtan\Coursemate\CampusMate\target\classes started by HP in D:\kirtan\Coursemate\CampusMate)
+2025-09-16 18:01:04 [restartedMain] DEBUG c.campusmate.CoursemateApplication - Running with Spring Boot v3.5.5, Spring v6.2.10
+2025-09-16 18:01:04 [restartedMain] INFO  c.campusmate.CoursemateApplication - The following 1 profile is active: "dev"
+2025-09-16 18:01:04 [restartedMain] INFO  o.s.b.d.e.DevToolsPropertyDefaultsPostProcessor - Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2025-09-16 18:01:04 [restartedMain] INFO  o.s.b.d.e.DevToolsPropertyDefaultsPostProcessor - For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2025-09-16 18:01:05 [restartedMain] WARN  o.s.b.w.s.c.AnnotationConfigServletWebServerApplicationContext - Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.support.BeanDefinitionOverrideException: Invalid bean definition with name 'corsConfigurer' defined in class path resource [com/campusmate/config/SecurityConfig.class]: Cannot register bean definition [Root bean: class=null; scope=; abstract=false; lazyInit=null; autowireMode=3; dependencyCheck=0; autowireCandidate=true; primary=false; fallback=false; factoryBeanName=securityConfig; factoryMethodName=corsConfigurer; initMethodNames=null; destroyMethodNames=[(inferred)]; defined in class path resource [com/campusmate/config/SecurityConfig.class]] for bean 'corsConfigurer' since there is already [Root bean: class=null; scope=; abstract=false; lazyInit=null; autowireMode=3; dependencyCheck=0; autowireCandidate=true; primary=false; fallback=false; factoryBeanName=corsConfig; factoryMethodName=corsConfigurer; initMethodNames=null; destroyMethodNames=[(inferred)]; defined in class path resource [com/campusmate/config/CorsConfig.class]] bound.
+2025-09-16 18:01:05 [restartedMain] INFO  o.s.b.a.l.ConditionEvaluationReportLogger - 
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+2025-09-16 18:01:05 [restartedMain] ERROR o.s.b.d.LoggingFailureAnalysisReporter - 
+
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+The bean 'corsConfigurer', defined in class path resource [com/campusmate/config/SecurityConfig.class], could not be registered. A bean with that name has already been defined in class path resource [com/campusmate/config/CorsConfig.class] and overriding is disabled.
+
+Action:
+
+Consider renaming one of the beans or enabling overriding by setting spring.main.allow-bean-definition-overriding=true
+
