@@ -58,7 +58,7 @@ src/main/java/com/coursemate/coursemate/
    ```
 
 4. **API Endpoints**
-   - Base URL: `http://localhost:8080/api/v1`
+   - Base URL: `https://campusmatebackend-production.up.railway.app/api/v1`
    - Auth endpoints: `/auth/**`
    - Public endpoints: `/public/**`
 
