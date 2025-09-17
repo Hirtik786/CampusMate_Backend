@@ -16,7 +16,7 @@ MAIL_HOST=smtp.gmail.com
 MAIL_PORT=587
 
 # Frontend URL (optional, defaults to http://localhost:3000)
-FRONTEND_URL=http://localhost:3000
+FRONTEND_URL=http://localhost:
 ```
 
 ## 📧 **Gmail App Password Setup**
