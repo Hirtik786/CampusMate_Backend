@@ -67,7 +67,21 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info
+        include: health,info,metrics
+      base-path: /actuator
   endpoint:
     health:
       show-details: when-authorized
+      # Enable liveness and readiness probes
+      probes:
+        enabled: true
+  health:
+    livenessstate:
+      enabled: true
+    readinessstate:
+      enabled: true
+  # Optional: Add more detailed health checks
+  metrics:
+    export:
+      prometheus:
+        enabled: false
