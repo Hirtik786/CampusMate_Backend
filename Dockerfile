@@ -1,20 +1,31 @@
-# Stage 1: Build the application using Maven Wrapper
+# Stage 1: build
 FROM maven:3.9.6-eclipse-temurin-21 AS build
 WORKDIR /app
 
-# Copy only mvnw and pom.xml first
+# copy wrapper and pom first for dependency caching
 COPY mvnw .
 COPY .mvn .mvn
 COPY pom.xml .
 
-# Make wrapper executable
 RUN chmod +x mvnw
-
-# Download dependencies (cached layer)
 RUN ./mvnw dependency:go-offline -B
 
-# Copy the source code last
+# copy source and build
 COPY src ./src
-
-# Build the application
 RUN ./mvnw clean package -DskipTests
+
+# Stage 2: runtime
+FROM eclipse-temurin:21-jre
+WORKDIR /app
+
+# copy the built jar from the build stage; adjust pattern if your jar name differs
+COPY --from=build /app/target/*.jar app.jar
+
+# Expose default port (optional)
+EXPOSE 8080
+
+# allow runtime JVM opts via env
+ENV JAVA_OPTS=""
+
+# start
+ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]
