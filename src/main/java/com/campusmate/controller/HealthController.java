@@ -1,17 +1,16 @@
 package com.campusmate.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.actuate.health.HealthEndpoint;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.http.ResponseEntity;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class HealthController {
 
-    @GetMapping("/health")
+    @GetMapping("/health/details")
     public String home() {
         return "Backend is running 🚀";
     }
