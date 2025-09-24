@@ -11,7 +11,7 @@ import java.util.Map;
 @RestController
 public class HealthController {
 
-    @GetMapping("/")
+    @GetMapping("/health")
     public String home() {
         return "Backend is running 🚀";
     }
