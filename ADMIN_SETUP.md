@@ -29,7 +29,7 @@ The system requires an admin user to be created manually. Here are the admin cre
 ### Method 3: REST API Endpoint
 
 1. **Start the backend** application
-2. **Call the endpoint:** `POST https://campusmatebackend-production.up.railway.app/admin/init`
+2. **Call the endpoint:** `POST https://campusmatebackend-production-a8da.up.railway.app//admin/init`
 3. **Check response** for success/error messages
 
 ## Database Connection Details
