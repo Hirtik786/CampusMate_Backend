@@ -17,15 +17,18 @@ import jakarta.annotation.PostConstruct;
 public class EmailService {
 
     @PostConstruct
-    public void checkConfiguration() {
-        if (fromEmail == null || fromEmail.trim().isEmpty() || fromEmail.equals("your-email@gmail.com")) {
-            log.error("⚠️  EMAIL SERVICE NOT CONFIGURED!");
-            log.error("Set MAIL_USERNAME and MAIL_PASSWORD environment variables");
-            log.error("Registration will fail until email is configured");
-        } else {
-            log.info("✅ Email service configured with: {}", fromEmail);
-        }
+public void checkConfiguration() {
+    log.info("MAIL_HOST: {}", System.getenv("MAIL_HOST"));
+    log.info("MAIL_USERNAME: {}", System.getenv("MAIL_USERNAME"));
+    log.info("From Email: {}", fromEmail);
+
+    if (fromEmail == null || fromEmail.trim().isEmpty()) {
+        log.error("❌ EMAIL CONFIGURATION MISSING!");
+    } else {
+        log.info("✅ Email service configured correctly.");
     }
+}
+
 
     private static final Logger log = LoggerFactory.getLogger(EmailService.class);
 
