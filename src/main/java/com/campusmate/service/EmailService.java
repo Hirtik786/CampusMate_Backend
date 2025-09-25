@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
+
 import jakarta.annotation.PostConstruct;
 
 /**
@@ -34,7 +35,7 @@ public class EmailService {
     @Value("${spring.mail.username:}")
     private String fromEmail;
 
-    @Value("${app.frontend.url:http://localhost:3000}")
+    @Value("${app.frontend.url:https://campusmatefrontend.netlify.app/}")
     private String frontendUrl;
 
     /**
