@@ -2,119 +2,102 @@ package com.campusmate.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
-import jakarta.annotation.PostConstruct;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 
 /**
- * Service for sending emails
+ * Service for sending emails via Brevo API (no SMTP)
  */
 @Service
 public class EmailService {
 
-    @PostConstruct
-    public void checkConfiguration() {
-        log.info("MAIL_HOST: {}", System.getenv("MAIL_HOST"));
-        log.info("MAIL_USERNAME: {}", System.getenv("MAIL_USERNAME"));
-        log.info("From Email: {}", fromEmail);
-
-        if (fromEmail == null || fromEmail.trim().isEmpty()) {
-            log.error("❌ EMAIL CONFIGURATION MISSING!");
-        } else {
-            log.info("✅ Email service configured correctly.");
-        }
-    }
-
     private static final Logger log = LoggerFactory.getLogger(EmailService.class);
 
-    @Autowired
-    private JavaMailSender mailSender;
+    @Value("${BREVO_API_KEY}")
+    private String brevoApiKey;
 
-    @Value("${spring.mail.username:}")
-private String smtpLogin;
-
-    @Value("${app.mail.from:}")
+    @Value("${app.mail.from:kumarhirtik3@gmail.com}")
     private String fromEmail;
 
-    @Value("${app.frontend.url:https://campusmatefrontend.netlify.app/}")
+    @Value("${app.frontend.url:https://campusmatefrontend.netlify.app}")
     private String frontendUrl;
 
+    private static final String API_URL = "https://api.brevo.com/v3/smtp/email";
+
     /**
-     * Send email verification email
+     * Send verification email
      */
     public void sendVerificationEmail(String toEmail, String token, String firstName) {
-        // Check if email configuration is available
-        if (fromEmail == null || fromEmail.trim().isEmpty()) {
-            log.error("Email configuration missing: MAIL_USERNAME not set");
-            throw new RuntimeException(
-                    "Email service not configured. Please set MAIL_USERNAME and MAIL_PASSWORD environment variables.");
-        }
+        String verificationUrl = frontendUrl + "/verify-email?token=" + token;
 
-        try {
-            SimpleMailMessage message = new SimpleMailMessage();
-            message.setFrom(fromEmail);
-            message.setTo(toEmail);
-            message.setSubject("Verify Your Email - CampusMate");
+        String jsonPayload = String.format("""
+            {
+              "sender": { "name": "CampusMate", "email": "%s" },
+              "to": [ { "email": "%s" } ],
+              "subject": "Verify Your Email - CampusMate",
+              "htmlContent": "<p>Hello %s,</p>
+                              <p>Thank you for registering with CampusMate!</p>
+                              <p>Please verify your email by clicking <a href='%s'>here</a>.</p>
+                              <p>This link will expire in 24 hours.</p>"
+            }
+            """, fromEmail, toEmail, firstName, verificationUrl);
 
-            String verificationUrl = frontendUrl + "/verify-email?token=" + token;
-
-            String emailBody = String.format(
-                    "Hello %s,\n\n" +
-                            "Thank you for registering with CampusMate! Please verify your email address by clicking the link below:\n\n"
-                            +
-                            "%s\n\n" +
-                            "This link will expire in 24 hours.\n\n" +
-                            "If you didn't create an account, please ignore this email.\n\n" +
-                            "Best regards,\n" +
-                            "The CampusMate Team",
-                    firstName, verificationUrl);
-
-            message.setText(emailBody);
-
-            mailSender.send(message);
-            log.info("Verification email sent successfully to: {}", toEmail);
-
-        } catch (Exception e) {
-            log.error("Failed to send verification email to: {}", toEmail, e);
-            throw new RuntimeException("Failed to send verification email: " + e.getMessage());
-        }
+        sendRequest(jsonPayload, toEmail, "verification");
     }
 
     /**
      * Send password reset email
      */
     public void sendPasswordResetEmail(String toEmail, String token, String firstName) {
+        String resetUrl = frontendUrl + "/reset-password?token=" + token;
+
+        String jsonPayload = String.format("""
+            {
+              "sender": { "name": "CampusMate", "email": "%s" },
+              "to": [ { "email": "%s" } ],
+              "subject": "Reset Your Password - CampusMate",
+              "htmlContent": "<p>Hello %s,</p>
+                              <p>You requested a password reset for your CampusMate account.</p>
+                              <p>Click <a href='%s'>here</a> to reset your password.</p>
+                              <p>This link will expire in 1 hour.</p>"
+            }
+            """, fromEmail, toEmail, firstName, resetUrl);
+
+        sendRequest(jsonPayload, toEmail, "password reset");
+    }
+
+    /**
+     * Generic HTTP request to Brevo
+     */
+    private void sendRequest(String jsonPayload, String toEmail, String type) {
         try {
-            SimpleMailMessage message = new SimpleMailMessage();
-            message.setFrom(fromEmail);
-            message.setTo(toEmail);
-            message.setSubject("Reset Your Password - CampusMate");
+            HttpClient client = HttpClient.newHttpClient();
 
-            String resetUrl = frontendUrl + "/reset-password?token=" + token;
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(API_URL))
+                    .header("accept", "application/json")
+                    .header("api-key", brevoApiKey)
+                    .header("content-type", "application/json")
+                    .POST(HttpRequest.BodyPublishers.ofString(jsonPayload))
+                    .build();
 
-            String emailBody = String.format(
-                    "Hello %s,\n\n" +
-                            "You requested a password reset for your CampusMate account. Click the link below to reset your password:\n\n"
-                            +
-                            "%s\n\n" +
-                            "This link will expire in 1 hour.\n\n" +
-                            "If you didn't request a password reset, please ignore this email.\n\n" +
-                            "Best regards,\n" +
-                            "The CampusMate Team",
-                    firstName, resetUrl);
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-            message.setText(emailBody);
-
-            mailSender.send(message);
-            log.info("Password reset email sent successfully to: {}", toEmail);
+            if (response.statusCode() >= 200 && response.statusCode() < 300) {
+                log.info("✅ {} email sent successfully to {}", type, toEmail);
+            } else {
+                log.error("❌ Failed to send {} email to {}. Response: {}", type, toEmail, response.body());
+                throw new RuntimeException("Brevo email sending failed: " + response.body());
+            }
 
         } catch (Exception e) {
-            log.error("Failed to send password reset email to: {}", toEmail, e);
-            throw new RuntimeException("Failed to send password reset email", e);
+            log.error("❌ Exception while sending {} email to {}", type, toEmail, e);
+            throw new RuntimeException("Email sending failed", e);
         }
     }
 }
