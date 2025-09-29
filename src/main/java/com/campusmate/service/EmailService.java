@@ -17,18 +17,17 @@ import jakarta.annotation.PostConstruct;
 public class EmailService {
 
     @PostConstruct
-public void checkConfiguration() {
-    log.info("MAIL_HOST: {}", System.getenv("MAIL_HOST"));
-    log.info("MAIL_USERNAME: {}", System.getenv("MAIL_USERNAME"));
-    log.info("From Email: {}", fromEmail);
+    public void checkConfiguration() {
+        log.info("MAIL_HOST: {}", System.getenv("MAIL_HOST"));
+        log.info("MAIL_USERNAME: {}", System.getenv("MAIL_USERNAME"));
+        log.info("From Email: {}", fromEmail);
 
-    if (fromEmail == null || fromEmail.trim().isEmpty()) {
-        log.error("❌ EMAIL CONFIGURATION MISSING!");
-    } else {
-        log.info("✅ Email service configured correctly.");
+        if (fromEmail == null || fromEmail.trim().isEmpty()) {
+            log.error("❌ EMAIL CONFIGURATION MISSING!");
+        } else {
+            log.info("✅ Email service configured correctly.");
+        }
     }
-}
-
 
     private static final Logger log = LoggerFactory.getLogger(EmailService.class);
 
@@ -36,6 +35,9 @@ public void checkConfiguration() {
     private JavaMailSender mailSender;
 
     @Value("${spring.mail.username:}")
+private String smtpLogin;
+
+    @Value("${app.mail.from:}")
     private String fromEmail;
 
     @Value("${app.frontend.url:https://campusmatefrontend.netlify.app/}")
@@ -48,33 +50,34 @@ public void checkConfiguration() {
         // Check if email configuration is available
         if (fromEmail == null || fromEmail.trim().isEmpty()) {
             log.error("Email configuration missing: MAIL_USERNAME not set");
-            throw new RuntimeException("Email service not configured. Please set MAIL_USERNAME and MAIL_PASSWORD environment variables.");
+            throw new RuntimeException(
+                    "Email service not configured. Please set MAIL_USERNAME and MAIL_PASSWORD environment variables.");
         }
-        
+
         try {
             SimpleMailMessage message = new SimpleMailMessage();
             message.setFrom(fromEmail);
             message.setTo(toEmail);
             message.setSubject("Verify Your Email - CampusMate");
-            
+
             String verificationUrl = frontendUrl + "/verify-email?token=" + token;
-            
+
             String emailBody = String.format(
-                "Hello %s,\n\n" +
-                "Thank you for registering with CampusMate! Please verify your email address by clicking the link below:\n\n" +
-                "%s\n\n" +
-                "This link will expire in 24 hours.\n\n" +
-                "If you didn't create an account, please ignore this email.\n\n" +
-                "Best regards,\n" +
-                "The CampusMate Team",
-                firstName, verificationUrl
-            );
-            
+                    "Hello %s,\n\n" +
+                            "Thank you for registering with CampusMate! Please verify your email address by clicking the link below:\n\n"
+                            +
+                            "%s\n\n" +
+                            "This link will expire in 24 hours.\n\n" +
+                            "If you didn't create an account, please ignore this email.\n\n" +
+                            "Best regards,\n" +
+                            "The CampusMate Team",
+                    firstName, verificationUrl);
+
             message.setText(emailBody);
-            
+
             mailSender.send(message);
             log.info("Verification email sent successfully to: {}", toEmail);
-            
+
         } catch (Exception e) {
             log.error("Failed to send verification email to: {}", toEmail, e);
             throw new RuntimeException("Failed to send verification email: " + e.getMessage());
@@ -90,25 +93,25 @@ public void checkConfiguration() {
             message.setFrom(fromEmail);
             message.setTo(toEmail);
             message.setSubject("Reset Your Password - CampusMate");
-            
+
             String resetUrl = frontendUrl + "/reset-password?token=" + token;
-            
+
             String emailBody = String.format(
-                "Hello %s,\n\n" +
-                "You requested a password reset for your CampusMate account. Click the link below to reset your password:\n\n" +
-                "%s\n\n" +
-                "This link will expire in 1 hour.\n\n" +
-                "If you didn't request a password reset, please ignore this email.\n\n" +
-                "Best regards,\n" +
-                "The CampusMate Team",
-                firstName, resetUrl
-            );
-            
+                    "Hello %s,\n\n" +
+                            "You requested a password reset for your CampusMate account. Click the link below to reset your password:\n\n"
+                            +
+                            "%s\n\n" +
+                            "This link will expire in 1 hour.\n\n" +
+                            "If you didn't request a password reset, please ignore this email.\n\n" +
+                            "Best regards,\n" +
+                            "The CampusMate Team",
+                    firstName, resetUrl);
+
             message.setText(emailBody);
-            
+
             mailSender.send(message);
             log.info("Password reset email sent successfully to: {}", toEmail);
-            
+
         } catch (Exception e) {
             log.error("Failed to send password reset email to: {}", toEmail, e);
             throw new RuntimeException("Failed to send password reset email", e);
