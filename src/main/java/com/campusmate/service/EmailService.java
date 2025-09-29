@@ -53,7 +53,7 @@ public void checkConfiguration() {
         
         try {
             SimpleMailMessage message = new SimpleMailMessage();
-            message.setFrom("karwahirtik@gmail.com");
+            message.setFrom(fromEmail);
             message.setTo(toEmail);
             message.setSubject("Verify Your Email - CampusMate");
             
@@ -87,7 +87,7 @@ public void checkConfiguration() {
     public void sendPasswordResetEmail(String toEmail, String token, String firstName) {
         try {
             SimpleMailMessage message = new SimpleMailMessage();
-            message.setFrom("karwahirtik@gmail.com");
+            message.setFrom(fromEmail);
             message.setTo(toEmail);
             message.setSubject("Reset Your Password - CampusMate");
             
