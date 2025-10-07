@@ -73,3 +73,20 @@ management:
     export:
       prometheus:
         enabled: false
+spring:
+  mail:
+    host: smtp-relay.brevo.com
+    port: 587
+    username: ${MAIL_USERNAME:97b8b0003@smtp-brevo.com}
+    password: ${BREVO_SMTP_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+        debug: true
+app:
+  mail:
+    from: ${MAIL_FROM:kumarhirtik3@gmail.com}
