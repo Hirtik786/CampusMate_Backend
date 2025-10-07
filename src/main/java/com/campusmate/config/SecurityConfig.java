@@ -35,7 +35,8 @@ public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final UserDetailsService userDetailsService;
 
-    public SecurityConfig(JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint,
+    public SecurityConfig(
+            JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint,
             JwtAuthenticationFilter jwtAuthenticationFilter,
             UserDetailsService userDetailsService) {
         this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
@@ -46,50 +47,58 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+                // ✅ Disable CSRF for REST APIs
                 .csrf(AbstractHttpConfigurer::disable)
-                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // ✅ Apply CORS
+
+                // ✅ Enable CORS using our config below
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+
+                // ✅ Define public endpoints
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/health").permitAll()
-                        .requestMatchers("/auth/**").permitAll()
-                        .requestMatchers("/api/v1/auth/**").permitAll()
-                        .requestMatchers("/api/v1/public/**").permitAll()
-                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                        .requestMatchers("/actuator/health").permitAll()
-                        .requestMatchers("/queries/**").permitAll()
-                        .requestMatchers("/projects/**").permitAll()
-                        .requestMatchers("/admin/**").permitAll()
-                        .anyRequest().permitAll() // 🔒 later restrict this
+                        .requestMatchers(
+                                "/",
+                                "/health",
+                                "/auth/**",
+                                "/api/v1/auth/**",
+                                "/api/v1/public/**",
+                                "/swagger-ui/**",
+                                "/v3/api-docs/**",
+                                "/actuator/health",
+                                "/queries/**",
+                                "/projects/**",
+                                "/admin/**"
+                        ).permitAll()
+                        .anyRequest().authenticated()
                 )
-                .exceptionHandling(exception -> exception
-                        .authenticationEntryPoint(jwtAuthenticationEntryPoint))
-                .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+
+                // ✅ Handle unauthorized requests
+                .exceptionHandling(ex -> ex.authenticationEntryPoint(jwtAuthenticationEntryPoint))
+
+                // ✅ Stateless session (JWT-based)
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+
+                // ✅ Authentication setup
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
 
-    // ✅ Proper CORS config
+    // ✅ CORS setup
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        // ✅ Use allowedOriginPatterns for production
         configuration.setAllowedOriginPatterns(List.of(
+                "https://campusmatefrontend.netlify.app",
                 "http://localhost:5173",
-                "http://localhost:3000",
-                "https://campusmatefrontend.netlify.app"));
+                "http://localhost:3000"
+        ));
 
-        // ✅ Allow common HTTP methods
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
-
-        // ✅ Allow all headers including Authorization
-        configuration.setAllowedHeaders(List.of("*"));
-
-        // ✅ Needed if sending cookies or JWT
+        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "Accept", "Origin"));
+        configuration.setExposedHeaders(List.of("Authorization"));
         configuration.setAllowCredentials(true);
-
         configuration.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
@@ -98,6 +107,7 @@ public class SecurityConfig {
         return source;
     }
 
+    // ✅ Auth beans
     @Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
