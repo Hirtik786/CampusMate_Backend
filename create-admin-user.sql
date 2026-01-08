@@ -3,7 +3,7 @@
 
 -- First, check if admin user already exists
 SELECT * FROM users WHERE email = 'orazovgeldymurad@gmail.com';
-
+--
 -- If no admin user exists, create one
 -- Note: The password hash below is for 'newpassword2005cs' encoded with BCrypt
 INSERT INTO users (
